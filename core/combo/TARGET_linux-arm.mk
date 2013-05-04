@@ -65,35 +65,36 @@ ifneq ($(wildcard $(TARGET_TOOLS_PREFIX)gcc$(HOST_EXECUTABLE_SUFFIX)),)
 endif
 
 TARGET_NO_UNDEFINED_LDFLAGS := -Wl,--no-undefined
-ifeq ($(TARGET_USE_O2),true)
-TARGET_arm_CFLAGS :=    -Os \
+
+TARGET_arm_CFLAGS :=    -O2 \
+                        -fgcse-after-reload \
+                        -fipa-cp-clone \
+                        -fpredictive-commoning \
+                        -fsched-spec-load \
+                        -funswitch-loops \
+                        -fvect-cost-model \
                         -fomit-frame-pointer \
-                        -fstrict-aliasing    \
-                        -fno-tree-vectorize
-else
-TARGET_arm_CFLAGS :=    -O3 \
-                        -fomit-frame-pointer \
-                        -fstrict-aliasing    \
-                        -funswitch-loops
-endif
+                        -fstrict-aliasing \
+                        -Wstrict-aliasing=3 \
+                        -Werror=strict-aliasing
+
 # Modules can choose to compile some source as thumb. As
 # non-thumb enabled targets are supported, this is treated
 # as a 'hint'. If thumb is not enabled, these files are just
 # compiled as ARM.
 ifeq ($(ARCH_ARM_HAVE_THUMB_SUPPORT),true)
-    ifeq ($(TARGET_USE_O2),true)
-    TARGET_thumb_CFLAGS :=  -mthumb \
-                            -O2 \
-                            -fomit-frame-pointer \
-                            -fno-strict-aliasing \
-                            -fno-tree-vectorize
-    else
-    TARGET_thumb_CFLAGS :=  -mthumb \
-                            -O3 \
-                            -fomit-frame-pointer \
-                            -fno-strict-aliasing \
-                            -fno-tree-vectorize
-    endif
+TARGET_thumb_CFLAGS :=  -mthumb \
+                        -Os \
+                        -fgcse-after-reload \
+                        -fipa-cp-clone \
+                        -fpredictive-commoning \
+                        -fsched-spec-load \
+                        -funswitch-loops \
+                        -fvect-cost-model \
+                        -fomit-frame-pointer \
+                        -fstrict-aliasing \
+                        -Wstrict-aliasing=3 \
+                        -Werror=strict-aliasing
 else
 TARGET_thumb_CFLAGS := $(TARGET_arm_CFLAGS)
 endif
@@ -168,14 +169,25 @@ endif
 TARGET_GLOBAL_CPPFLAGS += -fvisibility-inlines-hidden $(call cc-option,-std=gnu++11)
 
 # More flags/options can be added here
-TARGET_RELEASE_CFLAGS := \
-			-DNDEBUG \
-			-g \
-			-Wstrict-aliasing=2 \
-			-Werror=strict-aliasing \
-			-fgcse-after-reload \
-			-frerun-cse-after-loop \
-			-frename-registers
+ifndef TARGET_EXTRA_CFLAGS
+  TARGET_RELEASE_CFLAGS := \
+			  -DNDEBUG \
+			  -g \
+			  -Wstrict-aliasing=3 \
+			  -Werror=strict-aliasing \
+			  -fgcse-after-reload \
+			  -frerun-cse-after-loop \
+			  -frename-registers
+else
+  TARGET_RELEASE_CFLAGS += \
+			  -DNDEBUG \
+			  -g \
+			  -Wstrict-aliasing=3 \
+			  -Werror=strict-aliasing \
+			  -fgcse-after-reload \
+			  -frerun-cse-after-loop \
+			  -frename-registers
+endif
 
 libc_root := bionic/libc
 libm_root := bionic/libm
