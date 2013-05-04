@@ -66,7 +66,7 @@ endif
 
 TARGET_NO_UNDEFINED_LDFLAGS := -Wl,--no-undefined
 
-Tifeq ($(USE_MORE_OPT_FLAGS),yes)
+ifeq ($(USE_MORE_OPT_FLAGS),yes)
     TARGET_arm_CFLAGS :=    -O3 \
                             -fomit-frame-pointer \
                             -fstrict-aliasing \
@@ -86,6 +86,7 @@ else
                             -fstrict-aliasing \
                             -Wstrict-aliasing=3 \
                             -Werror=strict-aliasing
+endif
 
 # Modules can choose to compile some source as thumb. As
 # non-thumb enabled targets are supported, this is treated
