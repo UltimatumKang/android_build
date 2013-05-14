@@ -61,12 +61,12 @@ function check_product()
         return
     fi
 
-    if (echo -n $1 | grep -q -e "^carbon_") ; then
-       CARBON_BUILD=$(echo -n $1 | sed -e 's/^carbon_//g')
+    if (echo -n $1 | grep -q -e "^ukg_") ; then
+       UKG_BUILD=$(echo -n $1 | sed -e 's/^ukg_//g')
     else
-       CARBON_BUILD=
+       UKG_BUILD=
     fi
-    export CARBON_BUILD
+    export UKG_BUILD
 
     CALLED_FROM_SETUP=true BUILD_SYSTEM=build/core \
         TARGET_PRODUCT=$1 \
@@ -139,7 +139,7 @@ function setpaths()
     case $ARCH in
         x86) toolchaindir=x86/i686-linux-android-4.6/bin
             ;;
-        arm) toolchaindir=arm/arm-linux-androideabi-$targetgccversion/bin
+        arm) toolchaindir=arm/arm-linux-androideabi-4.9/bin
             ;;
         mips) toolchaindir=mips/mipsel-linux-android-4.6/bin
             ;;
@@ -155,7 +155,7 @@ function setpaths()
     unset ARM_EABI_TOOLCHAIN ARM_EABI_TOOLCHAIN_PATH
     case $ARCH in
         arm)
-            toolchaindir=arm/arm-eabi-$targetgccversion/bin
+            toolchaindir=arm/arm-eabi-4.7/bin
             if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
                  export ARM_EABI_TOOLCHAIN="$gccprebuiltdir/$toolchaindir"
                  ARM_EABI_TOOLCHAIN_PATH=":$gccprebuiltdir/$toolchaindir"
@@ -456,7 +456,7 @@ function print_lunch_menu()
     echo
     echo "You're building on" $uname
     echo
-    if [ "z${CARBON_DEVICES_ONLY}" != "z" ]; then
+    if [ "z${UKG_DEVICES_ONLY}" != "z" ]; then
        echo "Breakfast menu... pick a combo:"
     else
        echo "Lunch menu... pick a combo:"
@@ -470,7 +470,7 @@ function print_lunch_menu()
         i=$(($i+1))
     done
 
-    if [ "z${CARBON_DEVICES_ONLY}" != "z" ]; then
+    if [ "z${UKG_DEVICES_ONLY}" != "z" ]; then
        echo "... and don't forget the bacon!"
     fi
 
@@ -481,7 +481,7 @@ function brunch()
 {
     breakfast $*
     if [ $? -eq 0 ]; then
-        mka carbon
+        mka ukg
     else
         echo "No such item in brunch menu. Try 'breakfast'"
         return 1
@@ -492,10 +492,10 @@ function brunch()
 function breakfast()
 {
     target=$1
-    CARBON_DEVICES_ONLY="true"
+    UKG_DEVICES_ONLY="true"
     unset LUNCH_MENU_CHOICES
     add_lunch_combo full-eng
-    for f in `/bin/ls vendor/carbon/vendorsetup.sh 2> /dev/null`
+    for f in `/bin/ls vendor/ukg/vendorsetup.sh 2> /dev/null`
         do
             echo "including $f"
             . $f
@@ -511,8 +511,8 @@ function breakfast()
             # A buildtype was specified, assume a full device name
             lunch $target
         else
-            # This is probably just the CARBON model name
-            lunch carbon_$target-userdebug
+            # This is probably just the Xylon model name
+            lunch ukg_$target-userdebug
         fi
     fi
     return $?
@@ -647,8 +647,8 @@ function tapas()
 function eat()
 {
     if [ "$OUT" ] ; then
-        MODVERSION=$(get_build_var CARBON_VERSION)
-        ZIPFILE=carbon-$MODVERSION.zip
+        MODVERSION=$(get_build_var UKG_VERSION)
+        ZIPFILE=ukg-$MODVERSION.zip
         ZIPPATH=$OUT/$ZIPFILE
         if [ ! -f $ZIPPATH ] ; then
             echo "Nothing to eat"
@@ -663,7 +663,7 @@ function eat()
             done
             echo "Device Found.."
         fi
-    if (adb shell cat /system/build.prop | grep -q "ro.carbon.device=$CARBON_BUILD");
+    if (adb shell cat /system/build.prop | grep -q "ro.ukg.device=$UKG_BUILD");
     then
         # if adbd isn't root we can't write to /cache/recovery/
         adb root
@@ -688,7 +688,7 @@ EOF
     fi
     return $?
     else
-        echo "The connected device does not appear to be $CARBON_BUILD, run away!"
+        echo "The connected device does not appear to be $UKG_BUILD, run away!"
     fi
 }
 
@@ -1274,7 +1274,7 @@ function lska() {
     if [ ! -z "$1" ]; then
         for i in "$@"; do
             case $i in
-                carbon|otapackage|systemimage)
+                ukg|otapackage|systemimage)
                     mka installclean
                     mka $i
                     ;;
