@@ -419,7 +419,6 @@ def WriteFullOTAPackage(input_zip, output_zip):
     script.FormatPartition("/data")
 
   script.Print("                                        ");
-  script.Print("                                        ");
   script.Print("     Ultimatum ROM - formerly Xylon     ");
   script.Print("         Android 4.2.2 JDQ39E           ");
   script.Print("     Simple                             ");
@@ -430,6 +429,7 @@ def WriteFullOTAPackage(input_zip, output_zip):
   script.Print("                                        ");
   script.Print("       And yes, words are floating      ");
   script.Print("            in thin air. =)             ");
+  script.Print("                                        ");
 
   script.Print("Erasing System...")
 
